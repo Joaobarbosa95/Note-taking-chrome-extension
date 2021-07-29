@@ -1,0 +1,27 @@
+{
+    "manifest_version": 3,
+    "name": "Papyrus",
+    "version": "1.0",
+    "description": "Build extension",
+    "background": {
+        "service_worker": "background.js"
+    },
+    "permissions": [
+        "activeTab",
+        "storage",
+        "tabs"
+    ],
+    "action": {
+        "default_title": "Click to add note",
+        "default_icon": {
+            "128": "papyrus.png"
+        },
+        "default_popup": "index.html"
+    },
+    "icons": {
+        "16": "papyrus.png",
+        "48": "papyrus.png",
+        "128": "papyrus.png"
+    },
+    "options_page": "options.html"
+}
