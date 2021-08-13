@@ -9,10 +9,11 @@
     "permissions": [
         "activeTab",
         "storage",
-        "tabs"
+        "tabs",
+        "contextMenus"
     ],
     "action": {
-        "default_title": "Click to add note",
+        "default_title": "Click to view/add note",
         "default_icon": {
             "128": "papyrus.png"
         },

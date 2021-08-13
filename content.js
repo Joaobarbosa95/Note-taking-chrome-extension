@@ -346,3 +346,12 @@ chrome.runtime.sendMessage("get-database", async function (response) {
     }
   }
 });
+
+// Info --- Block that will appear when you hover in "i" symbol
+// Host -> in websites like google, the app diferenciates www.google.pt from www.google.com, etc.
+// Don't expect to see all your notes, except if the hostname is exactly the same
+// Url -> In website with dynamic url (search results url´s) it´s not recommended take notes
+// The relation between url and the note can/will be lost
+// Be sure to save your note before clicking outside the extension popup window
+
+

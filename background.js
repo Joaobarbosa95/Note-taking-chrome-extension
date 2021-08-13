@@ -31,7 +31,17 @@ chrome.runtime.onInstalled.addListener(() => {
     };
     const objectStore = db.createObjectStore("Notes", { keyPath: "id" });
   };
+
+  chrome.contextMenus.create({
+    id: "add",
+    title: "Insert selected text into note",
+    contexts: ["page", "selection", "link"],
+  });
 });
+
+/**
+ * When extension is oppened
+ */
 
 let cachedNotes;
 // Message handling
@@ -166,5 +176,57 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     sendResponse({});
     return true;
+  }
+});
+
+function addNote(note) {
+  let db = indexedDB.open(["Notes"]);
+  db.onsuccess = function (event) {
+    db = event.target.result;
+    const transaction = db.transaction(["Notes"], "readwrite");
+    const objectStore = transaction.objectStore("Notes");
+    objectStore.add(note);
+  };
+
+  db.onerror = function (event) {
+    console.log("Impossible to save note to database");
+  };
+
+  if (cachedNotes) {
+    cachedNotes.push(message.note);
+  }
+}
+
+/**
+ * Context Menu
+ */
+
+chrome.contextMenus.onClicked.addListener(function (info) {
+  if (!info.selectionText || info.selectionText.trim() == "") return;
+
+  const url = new URL(info.pageUrl);
+
+  const noteObj = {
+    id: new Date().getTime(),
+    text: info.selectionText,
+    bookmarked: false,
+    hostname: url.hostname,
+    href: url.href,
+  };
+
+  let db = indexedDB.open(["Notes"]);
+  db.onsuccess = function (event) {
+    db = event.target.result;
+    const transaction = db.transaction(["Notes"], "readwrite");
+    const objectStore = transaction.objectStore("Notes");
+    objectStore.add(noteObj);
+  };
+
+  db.onerror = function (event) {
+    console.log("Impossible to save note to database");
+  };
+
+  if (cachedNotes) {
+    cachedNotes.push(noteObj);
   }
 });
