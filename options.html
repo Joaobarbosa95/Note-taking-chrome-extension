@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
-
+    <link rel="stylesheet" href="options.css" type="text/css">
   </head>
 
   <body>
-    <form id="storage" method="POST">
+    <form id="storage">
       <div class="window-size">
-        <label for="witdh">Width</label>
+        <label for="width">Width</label>
         <input name="width" type="number">
         <label for="heigth">Height</label>
         <input name="height" type="number">
@@ -18,13 +18,30 @@
         <label for="zoom out">Zoom out</label>
         <input name="zoom-out" type="number">
       </div>   
-      <div>
+      <div id="save">
         <input type="submit" value="Save">
       </div>
     </form>
-
-      <button id="download" type="click">Download all notes</button>
-      <button id="delete" type="click">Delete all notes</button>
+    
+    <button id="download" type="click">Download all notes</button>
+    <button id="delete" type="click">Delete all notes</button>
+    <div id="delete-confirm">
+      <p>Are you sure you want to delete all notes? </p>
+      <button id="accept">Accept</button>
+      <button id="abort">Abort</button>
+    </div>
+    <div id="confirmation"></div>
+    <footer>
+      <p>
+        Width - Extension window width
+      </p>
+      <p>
+        Height - Exntension window height
+      </p>
+      <p>
+        Zoom in/out - Change in zoom when clicked
+      </p>
+    </footer>
   </body>
   <script src="options.js"></script>
 </html>

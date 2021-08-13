@@ -180,7 +180,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
-  if (message === "clear-database") {
+  if (message == "clear-database") {
     let db = indexedDB.open(["Notes"]);
     db.onsuccess = function (event) {
       db = event.target.result;
@@ -201,7 +201,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     db.onerror = function (event) {
       console.log("Impossible to delete notes from database");
     };
-
     if (cachedNotes) cachedNotes = [];
 
     sendResponse({});

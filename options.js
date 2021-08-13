@@ -1,11 +1,7 @@
-// Options page
-// Change the start heigth and width -> precise box size people want
-// Also change the px number when you zoom in and out
-// Button to download all notes
-
 const storage = document.querySelector("#storage");
 const download = document.querySelector("#download");
 const deleteDb = document.querySelector("#delete");
+const confirmation = document.querySelector("#confirmation");
 
 const width = storage.elements.namedItem("width");
 const height = storage.elements.namedItem("height");
@@ -21,7 +17,6 @@ chrome.storage.sync.get("popup", function ({ popup }) {
 });
 
 storage.addEventListener("submit", function (e) {
-  e.preventDefault();
   const popup = {
     width: storageValue(width),
     height: storageValue(height),
@@ -30,7 +25,7 @@ storage.addEventListener("submit", function (e) {
   };
 
   chrome.storage.sync.set({ popup }, function () {
-    // Add some visual confirmation
+    confirmation.innerText = "Changes sucessfully updated";
   });
 });
 
@@ -42,7 +37,7 @@ function storageValue(element) {
   }
 }
 
-// Get all notes
+// Download all notes
 download.addEventListener("click", function () {
   chrome.runtime.sendMessage("get-database", function (response) {
     const db = response.database;
@@ -61,12 +56,27 @@ download.addEventListener("click", function () {
 });
 
 // Clear all notes
-async function clearAllNotes() {
-  deleteDb.addEventListener("click", function () {
-    // Add confirmation/abortion buttons before deletion
-    chrome.runtime.sendMessage("clear-database", function (response) {
-      console.log("database clear");
-      // add visual confirmation
-    });
+const deleteConfirm = document.querySelector("#delete-confirm");
+const accept = document.querySelector("#accept");
+const abort = document.querySelector("#abort");
+
+accept.addEventListener("click", function () {
+  chrome.runtime.sendMessage("clear-database", function (response) {
+    confirmation.style.display = "block";
+    confirmation.style.visibility = "visible";
+    confirmation.innerText = "Notes deleted";
+
+    deleteConfirm.style.display = "none";
+    deleteConfirm.style.visibility = "hidden";
   });
-}
+});
+
+abort.addEventListener("click", function () {
+  deleteConfirm.style.display = "none";
+  deleteConfirm.style.visibility = "hidden";
+});
+
+deleteDb.addEventListener("click", function () {
+  deleteConfirm.style.display = "block";
+  deleteConfirm.style.visibility = "visible";
+});
