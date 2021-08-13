@@ -1,14 +1,30 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="button.css">
+
   </head>
+
   <body>
-    <div id="buttonDiv">
-    </div>
-    <div>
-      <p>Choose a different background color!</p>
-    </div>
+    <form id="storage" method="POST">
+      <div class="window-size">
+        <label for="witdh">Width</label>
+        <input name="width" type="number">
+        <label for="heigth">Height</label>
+        <input name="height" type="number">
+      </div>
+      <div class="zoom-diff">
+        <label for="zoom-in">Zoom in</label>
+        <input name="zoom-in" type="number">
+        <label for="zoom out">Zoom out</label>
+        <input name="zoom-out" type="number">
+      </div>   
+      <div>
+        <input type="submit" value="Save">
+      </div>
+    </form>
+
+      <button id="download" type="click">Download all notes</button>
+      <button id="delete" type="click">Delete all notes</button>
   </body>
   <script src="options.js"></script>
 </html>

@@ -58,8 +58,8 @@ chrome.runtime.sendMessage("get-database", async function (response) {
       const zoomOut = document.querySelector(".bi-zoom-out");
 
       zoomOut.addEventListener("click", function () {
-        popup.width -= 10;
-        popup.height -= 10;
+        popup.width -= popup.zoomIn;
+        popup.height -= popup.zoomIn;
         chrome.storage.sync.set({ popup });
         html.style.width = body.style.width = popup.width + "px";
         html.style.height = body.style.height = popup.height + "px";
@@ -67,8 +67,8 @@ chrome.runtime.sendMessage("get-database", async function (response) {
       });
 
       zoomIn.addEventListener("click", function () {
-        popup.width += 10;
-        popup.height += 10;
+        popup.width += popup.zoomOut;
+        popup.height += popup.zoomOut;
         chrome.storage.sync.set({ popup });
         html.style.width = body.style.width = popup.width + "px";
         html.style.height = body.style.height = popup.height + "px";
@@ -353,5 +353,3 @@ chrome.runtime.sendMessage("get-database", async function (response) {
 // Url -> In website with dynamic url (search results url´s) it´s not recommended take notes
 // The relation between url and the note can/will be lost
 // Be sure to save your note before clicking outside the extension popup window
-
-

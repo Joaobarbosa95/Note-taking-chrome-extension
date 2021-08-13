@@ -5,6 +5,8 @@ chrome.runtime.onInstalled.addListener(() => {
   const popup = {
     width: 300,
     height: 500,
+    zoomIn: 10,
+    zoomOut: 10,
     save: function () {
       chrome.storage.sync.set({ popup: this });
       console.log("Extension window dimensions saved");
@@ -173,6 +175,34 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       );
       cachedNotes.splice(index, 1);
     }
+
+    sendResponse({});
+    return true;
+  }
+
+  if (message === "clear-database") {
+    let db = indexedDB.open(["Notes"]);
+    db.onsuccess = function (event) {
+      db = event.target.result;
+      const request = db
+        .transaction(["Notes"], "readwrite")
+        .objectStore("Notes")
+        .clear();
+
+      request.onerror = function () {
+        console.log("Impossible to delete database");
+      };
+
+      request.onsuccess = function (event) {
+        console.log("Notes deleted from database");
+      };
+    };
+
+    db.onerror = function (event) {
+      console.log("Impossible to delete notes from database");
+    };
+
+    if (cachedNotes) cachedNotes = [];
 
     sendResponse({});
     return true;
