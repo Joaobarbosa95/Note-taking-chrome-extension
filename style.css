@@ -47,7 +47,7 @@ i {
 }
 
 i:hover {
-  background-color: rgb(255 176 79);
+  background-color: rgb(247 188 97);
   border-radius: 5px;
 }
 
@@ -66,6 +66,10 @@ footer {
   justify-content: center;
   align-items: center;
   text-align: center;
+}
+
+footer i:hover {
+  background-color: rgb(114 155 216);
 }
 
 #download-btn {
@@ -127,4 +131,21 @@ header {
   right: 10px;
   display: none;
   visibility: hidden;
+}
+
+#info-text {
+  display: none;
+  visibility: hidden;
+  color: black;
+  font-size: 0.7em;
+  position: absolute;
+  z-index: 2;
+  background-color: white;
+  border: black 1px solid;
+  border-radius: 3px;
+  width: 250px;
+  height: 200px;
+  left: 30px;
+  bottom: 38px;
+  line-height: 150%;
 }

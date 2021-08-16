@@ -259,3 +259,5 @@ chrome.contextMenus.onClicked.addListener(function (info) {
     cachedNotes.push(noteObj);
   }
 });
+
+// Rewrite database openning and error handling

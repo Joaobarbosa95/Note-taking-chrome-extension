@@ -15,6 +15,17 @@ chrome.runtime.sendMessage("get-database", async function (response) {
   const toggle = document.querySelector("#toggle-btn");
   const footer = document.querySelector("footer");
 
+  const info = document.querySelector("#info-btn");
+  const infoText = document.querySelector("#info-text");
+
+  info.addEventListener("mouseover", function () {
+    elementVisible(infoText, true);
+  });
+
+  info.addEventListener("mouseleave", function() {
+    elementVisible(infoText, false)
+  })
+
   windowSize();
   renderNotes("href");
   addToggleFunctionality();
@@ -79,12 +90,16 @@ chrome.runtime.sendMessage("get-database", async function (response) {
 
   // Render notes to UI
   function renderNotes(site) {
-    // Loop throught individual notes and add them to UI
+    // Filter notes by hostname or url
     let hostnameNotes = db.filter((note) => note[site] === url[site]);
 
     // Sort by bookmarked
     hostnameNotes.sort((a, b) => a.bookmarked - b.bookmarked);
+
+    // Clear UI
     notesBody.innerHTML = "";
+
+    // Add notes
     for (let note in hostnameNotes) {
       const html = `
             <div id=${hostnameNotes[note].id} class="note">
@@ -146,11 +161,6 @@ chrome.runtime.sendMessage("get-database", async function (response) {
     textarea.style.width = "100%";
     textarea.style.height = "100%";
     textarea.style.resize = "none";
-
-    // Not sure if it works
-    // chrome.runtime.onSuspend.addListener(() => {
-    //   saveNotes(textarea);
-    // });
   }
 
   // Save notes
@@ -186,7 +196,6 @@ chrome.runtime.sendMessage("get-database", async function (response) {
       db.push(noteObj);
 
       // Render UI
-
       toggleButtonRender();
     });
   }
@@ -346,10 +355,3 @@ chrome.runtime.sendMessage("get-database", async function (response) {
     }
   }
 });
-
-// Info --- Block that will appear when you hover in "i" symbol
-// Host -> in websites like google, the app diferenciates www.google.pt from www.google.com, etc.
-// Don't expect to see all your notes, except if the hostname is exactly the same
-// Url -> In website with dynamic url (search results url´s) it´s not recommended take notes
-// The relation between url and the note can/will be lost
-// Be sure to save your note before clicking outside the extension popup window
