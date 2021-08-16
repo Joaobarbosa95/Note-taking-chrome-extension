@@ -104,8 +104,8 @@ span {
   background-color: white;
   border: black 1px solid;
   border-radius: 3px;
-  width: 250px;
-  height: 200px;
+  width: 150px;
+  height: 320px;
   left: 30px;
   bottom: 38px;
   line-height: 150%;
@@ -150,4 +150,22 @@ header {
   visibility: hidden;
 }
 
-media
+@media only screen and (max-width: 290px) {
+  .note-actions-box {
+    flex-direction: row;
+  }
+}
+
+@media only screen and (max-width: 220px) {
+  #info-btn {
+    position: static;
+  }
+  #download-btn {
+    position: static;
+  }
+  footer {
+    height: 80px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
