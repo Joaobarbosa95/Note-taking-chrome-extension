@@ -1,5 +1,5 @@
 /**
- * Save popup config on installation
+ * Save popup config on installation, database and context menu creation
  */
 chrome.runtime.onInstalled.addListener(() => {
   const popup = {
@@ -15,7 +15,7 @@ chrome.runtime.onInstalled.addListener(() => {
 
   popup.save();
 
-  // Open a database
+  // Open database
   const DBOpenRequest = indexedDB.open("Notes", 1);
   DBOpenRequest.onerror = function (event) {
     console.log("Error loading database");
@@ -31,9 +31,11 @@ chrome.runtime.onInstalled.addListener(() => {
     db.onerror = function (event) {
       console.log("Error loading database");
     };
-    const objectStore = db.createObjectStore("Notes", { keyPath: "id" });
+
+    db.createObjectStore("Notes", { keyPath: "id" });
   };
 
+  // Add context menu
   chrome.contextMenus.create({
     id: "add",
     title: "Insert selected text into note",
@@ -46,28 +48,23 @@ chrome.runtime.onInstalled.addListener(() => {
  */
 
 let cachedNotes;
+
 // Message handling
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // Send database and set cache
   if (message === "get-database") {
+    // If no cached notes exist, query database
     if (!cachedNotes) {
-      let db = indexedDB.open(["Notes"]);
+      openDB("readonly").then((objectStore) => {
+        if (!objectStore) return;
 
-      db.onsuccess = function (event) {
-        db = event.target.result;
-        const transaction = db.transaction(["Notes"], "readonly");
-        const objectStore = transaction.objectStore("Notes");
         objectStore.getAll().onsuccess = function (event) {
           cachedNotes = event.target.result;
           sendResponse({
             ["database"]: event.target.result,
           });
         };
-      };
-
-      db.onerror = function (event) {
-        console.log("Impossible to connect to database");
-      };
+      });
     } else {
       sendResponse({
         ["database"]: cachedNotes,
@@ -78,33 +75,25 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   // New note message passing
   if (message.note) {
-    let db = indexedDB.open(["Notes"]);
-    db.onsuccess = function (event) {
-      db = event.target.result;
-      const transaction = db.transaction(["Notes"], "readwrite");
-      const objectStore = transaction.objectStore("Notes");
+    openDB("readwrite").then((objectStore) => {
+      if (!objectStore) return;
+
       objectStore.add(message.note);
-    };
 
-    db.onerror = function (event) {
-      console.log("Impossible to save note to database");
-    };
+      if (cachedNotes) {
+        cachedNotes.push(message.note);
+      }
 
-    if (cachedNotes) {
-      cachedNotes.push(message.note);
-    }
-
-    sendResponse({});
+      sendResponse({});
+    });
     return true;
   }
 
   // Edit message passing
   if (message.edit) {
-    let db = indexedDB.open(["Notes"]);
-    db.onsuccess = function (event) {
-      db = event.target.result;
-      const transaction = db.transaction(["Notes"], "readwrite");
-      const objectStore = transaction.objectStore("Notes");
+    openDB("readwrite").then((objectStore) => {
+      if (!objectStore) return;
+
       const request = objectStore.get(message.edit.id);
 
       request.onerror = function () {
@@ -127,11 +116,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           console.log("Note updated successfully");
         };
       };
-    };
-
-    db.onerror = function (event) {
-      console.log("Impossible to edit note in database");
-    };
+    });
 
     if (cachedNotes) {
       const index = cachedNotes.findIndex(
@@ -148,13 +133,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.delete) {
-    let db = indexedDB.open(["Notes"]);
-    db.onsuccess = function (event) {
-      db = event.target.result;
-      const request = db
-        .transaction(["Notes"], "readwrite")
-        .objectStore("Notes")
-        .delete(message.delete.id);
+    openDB("readwrite").then((objectStore) => {
+      if (!objectStore) return;
+      const request = objectStore.delete(message.delete.id);
 
       request.onerror = function () {
         console.log("Impossible to update database");
@@ -163,11 +144,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       request.onsuccess = function (event) {
         console.log("Note deleted from database");
       };
-    };
-
-    db.onerror = function (event) {
-      console.log("Impossible to delete note from database");
-    };
+    });
 
     if (cachedNotes) {
       const index = cachedNotes.findIndex(
@@ -181,13 +158,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message == "clear-database") {
-    let db = indexedDB.open(["Notes"]);
-    db.onsuccess = function (event) {
-      db = event.target.result;
-      const request = db
-        .transaction(["Notes"], "readwrite")
-        .objectStore("Notes")
-        .clear();
+    openDB("readwrite").then((objectStore) => {
+      if (!objectStore) return;
+      const request = objectStore.clear();
 
       request.onerror = function () {
         console.log("Impossible to delete database");
@@ -196,35 +169,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       request.onsuccess = function (event) {
         console.log("Notes deleted from database");
       };
-    };
+    });
 
-    db.onerror = function (event) {
-      console.log("Impossible to delete notes from database");
-    };
     if (cachedNotes) cachedNotes = [];
 
     sendResponse({});
     return true;
   }
 });
-
-function addNote(note) {
-  let db = indexedDB.open(["Notes"]);
-  db.onsuccess = function (event) {
-    db = event.target.result;
-    const transaction = db.transaction(["Notes"], "readwrite");
-    const objectStore = transaction.objectStore("Notes");
-    objectStore.add(note);
-  };
-
-  db.onerror = function (event) {
-    console.log("Impossible to save note to database");
-  };
-
-  if (cachedNotes) {
-    cachedNotes.push(message.note);
-  }
-}
 
 /**
  * Context Menu
@@ -243,21 +195,30 @@ chrome.contextMenus.onClicked.addListener(function (info) {
     href: url.href,
   };
 
-  let db = indexedDB.open(["Notes"]);
-  db.onsuccess = function (event) {
-    db = event.target.result;
-    const transaction = db.transaction(["Notes"], "readwrite");
-    const objectStore = transaction.objectStore("Notes");
+  openDB("readwrite").then((objectStore) => {
+    if (!objectStore) return;
+
     objectStore.add(noteObj);
-  };
 
-  db.onerror = function (event) {
-    console.log("Impossible to save note to database");
-  };
-
-  if (cachedNotes) {
-    cachedNotes.push(noteObj);
-  }
+    if (cachedNotes) {
+      cachedNotes.push(noteObj);
+    }
+  });
 });
 
-// Rewrite database openning and error handling
+function openDB(mode) {
+  return new Promise((resolve, reject) => {
+    let db = indexedDB.open(["Notes"]);
+
+    db.onsuccess = function (event) {
+      db = event.target.result;
+      const transaction = db.transaction(["Notes"], `${mode}`);
+      resolve(transaction.objectStore("Notes"));
+    };
+
+    db.onerror = function (event) {
+      console.log("Impossible to connect to database");
+      reject();
+    };
+  });
+}

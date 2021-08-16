@@ -94,6 +94,23 @@ span {
   margin: 2px;
 }
 
+#info-text {
+  display: none;
+  visibility: hidden;
+  color: black;
+  font-size: 0.7em;
+  position: absolute;
+  z-index: 2;
+  background-color: white;
+  border: black 1px solid;
+  border-radius: 3px;
+  width: 250px;
+  height: 200px;
+  left: 30px;
+  bottom: 38px;
+  line-height: 150%;
+}
+
 /**
     HEADER
 */
@@ -133,19 +150,4 @@ header {
   visibility: hidden;
 }
 
-#info-text {
-  display: none;
-  visibility: hidden;
-  color: black;
-  font-size: 0.7em;
-  position: absolute;
-  z-index: 2;
-  background-color: white;
-  border: black 1px solid;
-  border-radius: 3px;
-  width: 250px;
-  height: 200px;
-  left: 30px;
-  bottom: 38px;
-  line-height: 150%;
-}
+media

@@ -18,14 +18,6 @@ chrome.runtime.sendMessage("get-database", async function (response) {
   const info = document.querySelector("#info-btn");
   const infoText = document.querySelector("#info-text");
 
-  info.addEventListener("mouseover", function () {
-    elementVisible(infoText, true);
-  });
-
-  info.addEventListener("mouseleave", function() {
-    elementVisible(infoText, false)
-  })
-
   windowSize();
   renderNotes("href");
   addToggleFunctionality();
@@ -51,6 +43,15 @@ chrome.runtime.sendMessage("get-database", async function (response) {
 
   // Add download notes functionality
   downloadNotes();
+
+  // Info box hover functionality
+  info.addEventListener("mouseover", function () {
+    elementVisible(infoText, true);
+  });
+
+  info.addEventListener("mouseleave", function () {
+    elementVisible(infoText, false);
+  });
 
   /**
    * FUNCTIONS DEFINITION
